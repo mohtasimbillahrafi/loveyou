@@ -77,8 +77,8 @@ button {
 
 #noBtn {
     background-color: #6c757d; color: white;
-    position: absolute; /* ট্রিকি মুভমেন্টের জন্য */
-    transition: transform 0.2s ease-out; /* স্মুথ পালানোর জন্য */
+    position: absolute; 
+    transition: transform 0.2s ease-out; 
     z-index: 3;
 }
 
@@ -92,7 +92,6 @@ button {
     background: #fff; padding: 30px; border-radius: 10px; max-width: 400px; width: 85%;
     text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     border-top: 10px solid #ff4b2b;
-    /* এনিমেশন */
     transform: translateY(100px) scale(0.5);
     opacity: 0;
     transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -109,4 +108,9 @@ button {
 
 #letterContent { color: #333; line-height: 1.6; white-space: pre-wrap; font-size: 15px; font-weight: 500;}
 
-.close-btn { background: #333; color: white; padding: 10px 20px; }
+/* Modal Buttons Styling */
+.modal-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 15px; flex-wrap: wrap;}
+.close-btn { background: #6c757d; color: white; padding: 10px 20px; }
+.close-btn:hover { background: #5a6268; }
+.create-own-btn { background: #d63384; color: white; padding: 10px 20px; box-shadow: 0 4px 10px rgba(214, 51, 132, 0.3); }
+.create-own-btn:hover { background: #b02a6b; transform: scale(1.05); }
