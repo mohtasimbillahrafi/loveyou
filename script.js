@@ -29,7 +29,7 @@ if (encryptedMsg) {
     setupScreen.style.display = 'none';
     proposalScreen.style.display = 'block';
     
-    // হিজিবিজি কোড ডিকোড করে আসল চিঠিটি সেট করা (Yes চাপলে তবেই দেখাবে)
+    // এনকোড করা কোড ডিকোড করে আসল চিঠিটি সেট করা (Yes চাপলে তবেই দেখাবে)
     try {
         letterContent.textContent = decodeMessage(encryptedMsg);
     } catch (e) {
@@ -37,41 +37,23 @@ if (encryptedMsg) {
     }
 }
 
-// 2. Link Generator & Shortener Logic
-async function generateLink() {
+// 2. Link Generator Logic (নিজের URL-এ)
+function generateLink() {
     const text = customLetterInput.value.trim();
     if (!text) {
         alert("দয়া করে কিছু লিখুন!");
         return;
     }
     
-    // লোডিং দেখানো
-    generateBtn.textContent = "Link তৈরি হচ্ছে... ⏳";
-    generateBtn.disabled = true;
-    
     // টেক্সটকে এনক্রিপ্ট করে পড়া অযোগ্য করা
     const encodedText = encodeMessage(text);
     
-    // বর্তমান ওয়েবসাইটের লিংকের সাথে মেসেজ জুড়ে দেওয়া
+    // বর্তমান ওয়েবসাইটের লিংকের সাথে মেসেজ জুড়ে দেওয়া (কোনো থার্ড-পার্টি শর্টনার ছাড়া)
     const baseUrl = window.location.origin + window.location.pathname;
-    const longLink = `${baseUrl}?msg=${encodedText}`;
+    const myOwnLink = `${baseUrl}?msg=${encodedText}`;
     
-    // TinyURL API ব্যবহার করে লিংক শর্ট করা
-    try {
-        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`);
-        if (response.ok) {
-            const shortLink = await response.text();
-            shareLink.value = shortLink;
-        } else {
-            shareLink.value = longLink; // শর্ট না হলে অন্তত লং লিংকটা দেবে
-        }
-    } catch (error) {
-        shareLink.value = longLink; // ইন্টারনেট বা এপিআই সমস্যা হলে
-    }
-    
+    shareLink.value = myOwnLink;
     linkContainer.style.display = 'block';
-    generateBtn.textContent = "Link তৈরি করুন 🔗";
-    generateBtn.disabled = false;
 }
 
 function copyLink() {
