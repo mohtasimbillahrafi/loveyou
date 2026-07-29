@@ -1,40 +1,79 @@
+// Screens & Elements
+const setupScreen = document.getElementById('setupScreen');
+const proposalScreen = document.getElementById('proposalScreen');
+const customLetterInput = document.getElementById('customLetterInput');
+const linkContainer = document.getElementById('linkContainer');
+const shareLink = document.getElementById('shareLink');
+
 const noBtn = document.getElementById('noBtn');
 const yesBtn = document.getElementById('yesBtn');
 const letterModal = document.getElementById('letterModal');
-const closeBtn = document.getElementById('closeBtn');
 const letterContent = document.getElementById('letterContent');
 
-// dynamic letter customizer from URL search params
+// 1. URL Check: বুঝতে হবে সে কি চিঠি বানাতে এসেছে নাকি প্রপোজাল পেয়েছে
 const urlParams = new URLSearchParams(window.location.search);
-const customMessage = urlParams.get('msg');
+const encryptedMsg = urlParams.get('msg');
 
-if (customMessage) {
-    letterContent.textContent = decodeURIComponent(customMessage);
-}
-
-// Function to move No button
-function moveNoButton() {
-    const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 50);
-    const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 50);
+if (encryptedMsg) {
+    // প্রপোজাল মোড: লিংক তৈরি করার স্ক্রিন হাইড করে প্রপোজাল স্ক্রিন দেখাবে
+    setupScreen.style.display = 'none';
+    proposalScreen.style.display = 'block';
     
-    noBtn.style.position = 'fixed';
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
+    // মেসেজ ডিকোড করে চিঠিতে সেট করা
+    letterContent.textContent = decodeURIComponent(encryptedMsg);
 }
 
-// Mouseover & Touchstart event for mobile and desktop
-noBtn.addEventListener('mouseover', moveNoButton);
+// 2. Link Generator Logic
+function generateLink() {
+    const text = customLetterInput.value.trim();
+    if (!text) {
+        alert("দয়া করে কিছু লিখুন!");
+        return;
+    }
+    
+    // টেক্সটকে URL ফ্রেন্ডলি করা
+    const encodedText = encodeURIComponent(text);
+    
+    // বর্তমান ওয়েবসাইটের লিংকের সাথে মেসেজ জুড়ে দেওয়া
+    const baseUrl = window.location.origin + window.location.pathname;
+    const finalLink = `${baseUrl}?msg=${encodedText}`;
+    
+    shareLink.value = finalLink;
+    linkContainer.style.display = 'block';
+}
+
+function copyLink() {
+    shareLink.select();
+    document.execCommand('copy');
+    document.getElementById('copyBtn').textContent = "Copied! ✔️";
+    setTimeout(() => {
+        document.getElementById('copyBtn').textContent = "Copy Link";
+    }, 2000);
+}
+
+// 3. No Button Trick Logic (Smooth Escape)
+function escapeNoBtn() {
+    // বাটনটিকে কার্ডের ভেতরে রেন্ডম পজিশনে সরানো
+    const maxX = 150; // ডানে-বামে কতদূর যাবে
+    const maxY = 150; // উপরে-নিচে কতদূর যাবে
+
+    const randomX = (Math.random() - 0.5) * 2 * maxX; 
+    const randomY = (Math.random() - 0.5) * 2 * maxY;
+
+    noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+}
+
+noBtn.addEventListener('mouseover', escapeNoBtn);
 noBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    moveNoButton();
+    e.preventDefault(); // মোবাইলে টাচ করলে ক্লিক হওয়া আটকাবে
+    escapeNoBtn();
 });
 
-// Show Letter Modal on Yes click
+// 4. Yes Button Animation Logic
 yesBtn.addEventListener('click', () => {
-    letterModal.style.display = 'flex';
+    letterModal.classList.add('active'); // এনিমেশন ট্রিগার করবে
 });
 
-// Close Modal
-closeBtn.addEventListener('click', () => {
-    letterModal.style.display = 'none';
-});
+function closeModal() {
+    letterModal.classList.remove('active');
+}
