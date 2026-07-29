@@ -3,27 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will You Be Mine? ❤️</title>
+    <title>Surprise For You! ❤️</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="card" id="mainCard">
+
+    <!-- Screen 1: Link Generator (যে লিংক তৈরি করবে তার জন্য) -->
+    <div class="card" id="setupScreen">
+        <h2>আপনার চিঠি তৈরি করুন 💌</h2>
+        <p>যাকে প্রপোজ করবেন, তার জন্য সুন্দর করে একটি চিঠি লিখুন:</p>
+        <textarea id="customLetterInput" placeholder="তোমার জন্য আমার মনের কথা..."></textarea>
+        <button id="generateBtn" onclick="generateLink()">Link তৈরি করুন 🔗</button>
+        
+        <div id="linkContainer" style="display: none;">
+            <p>আপনার লিংক রেডি! কপি করে পাঠিয়ে দিন:</p>
+            <input type="text" id="shareLink" readonly>
+            <button id="copyBtn" onclick="copyLink()">Copy Link</button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Proposal Screen (যাকে লিংক পাঠানো হবে সে এটি দেখবে) -->
+    <div class="card" id="proposalScreen" style="display: none;">
         <div class="heart-icon">💖</div>
-        <h1 id="question">Do you love me? 🥺</h1>
+        <h1>Do you love me? 🥺</h1>
         <div class="btn-group">
             <button id="yesBtn">Yes ❤️</button>
             <button id="noBtn">No 💔</button>
         </div>
     </div>
 
-    <!-- Letter Popup Modal -->
+    <!-- Animated Letter Modal -->
     <div class="modal" id="letterModal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeBtn">&times;</span>
-            <div class="letter-body">
-                <h2>Yayyy! 🎉❤️</h2>
-                <p id="letterContent">আমি জানতাম তুমি 'Yes' বলবে! তুমি আমার জীবনের সবথেকে সুন্দর অংশ। লাভ ইউ সো মাচ! ✨🥰</p>
+        <div class="letter-envelope" id="envelope">
+            <h2 class="letter-title">I Knew It! 🎉❤️</h2>
+            <div class="letter-content-box">
+                <p id="letterContent"></p>
             </div>
+            <button class="close-btn" onclick="closeModal()">বন্ধ করুন</button>
         </div>
     </div>
 
