@@ -107,3 +107,10 @@ yesBtn.addEventListener('click', () => {
 function closeModal() {
     letterModal.classList.remove('active');
 }
+
+// 5. Create Your Own Button Logic
+function createNew() {
+    // URL থেকে ?id= মুছে দিয়ে মেইন পেজে (Link Generator) রিডাইরেক্ট করবে
+    const baseUrl = window.location.origin + window.location.pathname;
+    window.location.href = baseUrl;
+}
