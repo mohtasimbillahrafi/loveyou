@@ -19,69 +19,64 @@ const ytPlayerContainer = document.getElementById('ytPlayerContainer');
 
 let proposalData = null;
 
-// YouTube Link থেকে Video ID বের করার ফাংশন
 function getYouTubeId(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
 }
 
-// 1. URL Check: শর্ট ID আছে কি না চেক করা
+// 1. Check Link & Load Data
 const urlParams = new URLSearchParams(window.location.search);
 const shortId = urlParams.get('id');
 
 if (shortId) {
-    setupScreen.classList.add('hidden');
+    setupScreen.style.display = 'none'; // Hide setup screen
     
-    // ক্লাউড থেকে ডাটা নিয়ে আসা
     fetch('https://bytebin.lucko.me/' + shortId)
-        .then(res => res.ok ? res.text() : Promise.reject('Not found'))
+        .then(res => {
+            if(res.ok) return res.text();
+            throw new Error('Not found');
+        })
         .then(text => {
             try {
                 proposalData = JSON.parse(text);
             } catch (e) {
-                proposalData = { msg: text, yt: null, time: 0 }; 
+                proposalData = { msg: text, yt: null, time: 0 };
             }
             
             letterContent.textContent = proposalData.msg;
 
-            // যদি গান থাকে, তবে "Tap to Open" স্ক্রিন দেখাবে এবং ব্যাকগ্রাউন্ডে Iframe রেডি করে রাখবে
             if (proposalData.yt) {
-                startOverlay.classList.remove('hidden');
-                // Iframe আগে থেকেই লোড করা হচ্ছে, কিন্তু প্লে হবে না
-                ytPlayerContainer.innerHTML = `<iframe id="ytMusicPlayer" width="10" height="10" 
-                    src="https://www.youtube.com/embed/${proposalData.yt}?enablejsapi=1&start=${proposalData.time}&autoplay=0" 
-                    allow="autoplay" style="position:absolute; opacity:0; z-index:-10;"></iframe>`;
+                // গান থাকলে Overlay দেখাবে
+                startOverlay.style.display = 'flex';
             } else {
-                proposalScreen.classList.remove('hidden');
+                // গান না থাকলে সরাসরি প্রপোজাল পেজ
+                proposalScreen.style.display = 'block';
             }
         })
         .catch(err => {
             letterContent.textContent = "আপনার জন্য একটি মেসেজ ছিল, কিন্তু লিংকটি ভুল বা মেয়াদ শেষ!";
-            proposalScreen.classList.remove('hidden');
+            proposalScreen.style.display = 'block';
         });
 }
 
-// 2. "Tap to Open" বাটনে ক্লিক করলে গান বাজবে
+// 2. Play Music reliably on click
 openSurpriseBtn.addEventListener('click', () => {
-    // স্ক্রিন ট্রানজিশন
-    startOverlay.style.opacity = '0';
-    setTimeout(() => {
-        startOverlay.classList.add('hidden');
-        proposalScreen.classList.remove('hidden');
-    }, 400);
+    startOverlay.style.display = 'none'; // Hide gift screen
+    proposalScreen.style.display = 'block'; // Show proposal screen
 
-    // মিউজিক প্লে ট্রিগার (ইউজার ক্লিকের সাথে সাথেই src আপডেট করে প্লে করা হচ্ছে)
+    // 100% Working Music Injection
     if (proposalData && proposalData.yt) {
-        const player = document.getElementById('ytMusicPlayer');
-        if(player) {
-            // এটি ব্রাউজারের অটো-প্লে ব্লক বাইপাস করবে কারণ ইউজারের ক্লিকের ভেতরেই এটি ট্রিগার হচ্ছে
-            player.src = `https://www.youtube.com/embed/${proposalData.yt}?enablejsapi=1&start=${proposalData.time}&autoplay=1`;
-        }
+        ytPlayerContainer.innerHTML = ''; // Clear old data if any
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('src', `https://www.youtube.com/embed/${proposalData.yt}?autoplay=1&start=${proposalData.time}&enablejsapi=1&mute=0`);
+        iframe.setAttribute('allow', 'autoplay');
+        iframe.style.display = 'none'; // Hide the video, keep audio
+        ytPlayerContainer.appendChild(iframe);
     }
 });
 
-// 3. Link Generator Logic
+// 3. Link Generator
 async function generateLink() {
     const text = customLetterInput.value.trim();
     if (!text) return alert("দয়া করে কিছু লিখুন!");
@@ -123,14 +118,13 @@ function copyLink() {
     setTimeout(() => { document.getElementById('copyBtn').textContent = "Copy Link"; }, 2000);
 }
 
-// 4. No Button Trick (অ্যাডভান্সড ম্যাথ দিয়ে স্মুথ করা হয়েছে)
+// 4. No Button Escaping Trick (Fixed logic)
 function moveNoBtn() {
-    const card = document.getElementById('proposalScreen');
-    const cardRect = card.getBoundingClientRect();
+    const cardRect = proposalScreen.getBoundingClientRect();
     const btnRect = noBtn.getBoundingClientRect();
     
-    const maxX = cardRect.width - btnRect.width - 20;
-    const maxY = cardRect.height - btnRect.height - 20;
+    const maxX = 150; 
+    const maxY = 150;
     
     const randomX = (Math.random() - 0.5) * maxX * 1.5;
     const randomY = (Math.random() - 0.5) * maxY * 1.5;
@@ -141,7 +135,15 @@ function moveNoBtn() {
 noBtn.addEventListener('mouseover', moveNoBtn);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 
-// 5. Yes Button & Modal Logic
-yesBtn.addEventListener('click', () => { letterModal.classList.add('active'); });
-function closeModal() { letterModal.classList.remove('active'); }
-function createNew() { window.location.href = window.location.origin + window.location.pathname; }
+// 5. Yes Button Fix (Guarantee popup opens)
+yesBtn.addEventListener('click', () => { 
+    letterModal.style.display = 'flex'; // Explicitly showing the modal
+});
+
+function closeModal() { 
+    letterModal.style.display = 'none'; // Explicitly hiding the modal
+}
+
+function createNew() { 
+    window.location.href = window.location.origin + window.location.pathname; 
+}
