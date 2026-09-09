@@ -8,43 +8,54 @@
 </head>
 <body>
 
-    <!-- Screen 1: Link Generator (যে লিংক তৈরি করবে তার জন্য) -->
-    <div class="card" id="setupScreen">
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+    </div>
+
+    <!-- Screen 1: Link Generator -->
+    <div class="glass-card" id="setupScreen">
         <h2>আপনার চিঠি তৈরি করুন 💌</h2>
-        <p>যাকে প্রপোজ করবেন, তার জন্য সুন্দর করে চিঠি লিখুন এবং চাইলে গান যোগ করুন:</p>
+        <p>যাকে প্রপোজ করবেন, তার জন্য সুন্দর করে চিঠি লিখুন:</p>
         
         <textarea id="customLetterInput" placeholder="তোমার জন্য আমার মনের কথা..."></textarea>
         
-        <!-- Music Setup -->
-        <input type="text" id="ytLinkInput" placeholder="YouTube গানের লিংক (ঐচ্ছিক)">
-        <input type="number" id="ytTimeInput" placeholder="গান কত সেকেন্ড থেকে শুরু হবে? (যেমন: 45)">
+        <div class="input-group">
+            <input type="text" id="ytLinkInput" placeholder="YouTube গানের লিংক (ঐচ্ছিক)">
+            <input type="number" id="ytTimeInput" placeholder="গান কত সেকেন্ড থেকে শুরু হবে? (যেমন: 45)">
+        </div>
         
-        <button id="generateBtn" onclick="generateLink()">Link তৈরি করুন 🔗</button>
+        <button id="generateBtn" class="primary-btn" onclick="generateLink()">Link তৈরি করুন 🔗</button>
         
-        <div id="linkContainer" style="display: none;">
+        <div id="linkContainer" class="hidden-box">
             <p>আপনার লিংক রেডি! কপি করে পাঠিয়ে দিন:</p>
             <input type="text" id="shareLink" readonly>
-            <button id="copyBtn" onclick="copyLink()">Copy Link</button>
+            <button id="copyBtn" class="success-btn" onclick="copyLink()">Copy Link</button>
         </div>
     </div>
 
-    <!-- Screen 1.5: Tap to Open Overlay (Music Auto-play ট্রিকের জন্য) -->
-    <div id="startOverlay" style="display: none;">
-        <div class="open-btn" id="openSurpriseBtn">ক্লিক করে খুলুন 🎁</div>
+    <!-- Screen 1.5: Tap to Open Overlay -->
+    <div id="startOverlay" class="overlay hidden">
+        <div class="envelope-wrapper" id="openSurpriseBtn">
+            <div class="heart-pulse">💌</div>
+            <h3>আপনার জন্য একটি সারপ্রাইজ!</h3>
+            <span class="click-text">Tap to Open</span>
+        </div>
     </div>
 
-    <!-- Screen 2: Proposal Screen (যাকে লিংক পাঠানো হবে সে এটি দেখবে) -->
-    <div class="card" id="proposalScreen" style="display: none;">
+    <!-- Screen 2: Proposal Screen -->
+    <div class="glass-card hidden" id="proposalScreen">
         <div class="heart-icon">💖</div>
         <h1>Do you love me? 🥺</h1>
         <div class="btn-group">
-            <button id="yesBtn">Yes ❤️</button>
-            <button id="noBtn">No 💔</button>
+            <button id="yesBtn" class="yes-btn">Yes ❤️</button>
+            <button id="noBtn" class="no-btn">No 💔</button>
         </div>
     </div>
 
     <!-- Animated Letter Modal -->
-    <div class="modal" id="letterModal">
+    <div class="modal hidden" id="letterModal">
         <div class="letter-envelope" id="envelope">
             <h2 class="letter-title">I Knew It! 🎉❤️</h2>
             <div class="letter-content-box">
@@ -58,8 +69,8 @@
         </div>
     </div>
 
-    <!-- Hidden YouTube Player Container -->
-    <div id="ytPlayerContainer" style="display: none;"></div>
+    <!-- Hidden YouTube Player -->
+    <div id="ytPlayerContainer"></div>
 
     <script src="script.js"></script>
 </body>
