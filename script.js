@@ -1,10 +1,12 @@
+// Elements
 const setupScreen = document.getElementById('setupScreen');
 const proposalScreen = document.getElementById('proposalScreen');
 const startOverlay = document.getElementById('startOverlay');
 const openSurpriseBtn = document.getElementById('openSurpriseBtn');
 
 const customLetterInput = document.getElementById('customLetterInput');
-const audioLinkInput = document.getElementById('audioLinkInput');
+const ytLinkInput = document.getElementById('ytLinkInput');
+const ytTimeInput = document.getElementById('ytTimeInput');
 const linkContainer = document.getElementById('linkContainer');
 const shareLink = document.getElementById('shareLink');
 const generateBtn = document.getElementById('generateBtn');
@@ -13,14 +15,19 @@ const noBtn = document.getElementById('noBtn');
 const yesBtn = document.getElementById('yesBtn');
 const letterModal = document.getElementById('letterModal');
 const letterContent = document.getElementById('letterContent');
-const bgAudio = document.getElementById('bgAudio');
-
-// কপিরাইট-মুক্ত রোমান্টিক সফট পিয়ানো মিউজিক (ডিফল্ট ব্যাকআপ)
-const DEFAULT_MUSIC = 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3';
 
 let proposalData = null;
+let ytPlayer = null;
 
-// 1. URL চেক করে ডাটা আনা
+// YouTube Video ID এক্সট্র্যাক্ট ফাংশন
+function getYouTubeId(url) {
+    if (!url) return '8UiAH3tJUTs';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '8UiAH3tJUTs';
+}
+
+// 1. URL চেক করে ডেটা লোড
 const urlParams = new URLSearchParams(window.location.search);
 const shortId = urlParams.get('id');
 
@@ -28,19 +35,19 @@ if (shortId) {
     setupScreen.style.display = 'none';
     
     fetch('https://bytebin.lucko.me/' + shortId)
-        .then(res => {
-            if(res.ok) return res.text();
-            throw new Error('Not found');
-        })
+        .then(res => res.ok ? res.text() : Promise.reject('Not found'))
         .then(text => {
             try {
                 proposalData = JSON.parse(text);
             } catch (e) {
-                proposalData = { msg: text, audio: DEFAULT_MUSIC };
+                proposalData = { msg: text, yt: '8UiAH3tJUTs', time: 14 };
             }
             
             letterContent.textContent = proposalData.msg;
-            startOverlay.style.display = 'flex'; // গিফট বক্স স্ক্রিন ওপেন
+            startOverlay.style.display = 'flex';
+            
+            // YouTube Player ইনিশিয়ালাইজ করা
+            initYouTubePlayer(proposalData.yt || '8UiAH3tJUTs', proposalData.time || 14);
         })
         .catch(err => {
             letterContent.textContent = "আপনার জন্য একটি মেসেজ ছিল, কিন্তু লিংকটি ভুল বা মেয়াদ শেষ!";
@@ -48,23 +55,55 @@ if (shortId) {
         });
 }
 
-// 2. গিফটে ক্লিক করলেই গান বাজবে (১০০% কাজ করবে)
+// YouTube Player Initializer
+function initYouTubePlayer(videoId, startTime) {
+    function createPlayer() {
+        ytPlayer = new YT.Player('ytPlayer', {
+            height: '200',
+            width: '200',
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 0,
+                'controls': 0,
+                'start': startTime,
+                'playsinline': 1,
+                'origin': window.location.origin
+            }
+        });
+    }
+
+    if (window.YT && window.YT.Player) {
+        createPlayer();
+    } else {
+        window.onYouTubeIframeAPIReady = createPlayer;
+    }
+}
+
+// 2. গিফটে ক্লিক করলে স্ক্রিন ওপেন এবং মিউজিক শুরু
 openSurpriseBtn.addEventListener('click', () => {
     startOverlay.style.display = 'none';
     proposalScreen.style.display = 'block';
 
-    const audioSource = (proposalData && proposalData.audio) ? proposalData.audio : DEFAULT_MUSIC;
-    bgAudio.src = audioSource;
-    bgAudio.play().catch(e => console.log("Audio play error:", e));
+    if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+        ytPlayer.unMute();
+        ytPlayer.setVolume(100);
+        if (proposalData && proposalData.time) {
+            ytPlayer.seekTo(proposalData.time, true);
+        }
+        ytPlayer.playVideo();
+    }
 });
 
 // 3. Link Generator
 async function generateLink() {
     const text = customLetterInput.value.trim();
-    if (!text) return alert("দয়া করে চিঠি লিখুন!");
+    if (!text) return alert("দয়া করে কিছু চিঠি লিখুন!");
     
-    const customAudio = audioLinkInput.value.trim() || DEFAULT_MUSIC;
-    const dataObj = { msg: text, audio: customAudio };
+    const ytUrl = ytLinkInput.value.trim() || 'https://youtu.be/8UiAH3tJUTs';
+    const ytId = getYouTubeId(ytUrl);
+    const ytTime = ytTimeInput.value ? parseInt(ytTimeInput.value) : 14;
+
+    const dataObj = { msg: text, yt: ytId, time: ytTime };
 
     generateBtn.textContent = "Link তৈরি হচ্ছে... ⏳";
     generateBtn.disabled = true;
@@ -109,7 +148,7 @@ function moveNoBtn() {
 noBtn.addEventListener('mouseover', moveNoBtn);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 
-// 5. Yes Button ও Modal Logic
+// 5. Yes Button & Modal
 yesBtn.addEventListener('click', () => { 
     letterModal.style.display = 'flex'; 
 });
