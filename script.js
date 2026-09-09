@@ -60,18 +60,28 @@ if (shortId) {
         });
 }
 
-// 2. Play Music reliably on click
+// 2. Play Music reliably on click (The Magic Fix ✨)
 openSurpriseBtn.addEventListener('click', () => {
     startOverlay.style.display = 'none'; // Hide gift screen
     proposalScreen.style.display = 'block'; // Show proposal screen
 
-    // 100% Working Music Injection
     if (proposalData && proposalData.yt) {
         ytPlayerContainer.innerHTML = ''; // Clear old data if any
+        
         const iframe = document.createElement('iframe');
+        // allow="autoplay" টা ঠিকমত দেয়া জরুরি
         iframe.setAttribute('src', `https://www.youtube.com/embed/${proposalData.yt}?autoplay=1&start=${proposalData.time}&enablejsapi=1&mute=0`);
-        iframe.setAttribute('allow', 'autoplay');
-        iframe.style.display = 'none'; // Hide the video, keep audio
+        iframe.setAttribute('allow', 'autoplay; encrypted-media');
+        
+        // 브라우জার বাইপাস করার ট্রিক! (display:none এর বদলে এটা)
+        iframe.style.position = 'absolute';
+        iframe.style.top = '-9999px';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.border = 'none';
+        iframe.style.opacity = '0';
+        
         ytPlayerContainer.appendChild(iframe);
     }
 });
@@ -118,7 +128,7 @@ function copyLink() {
     setTimeout(() => { document.getElementById('copyBtn').textContent = "Copy Link"; }, 2000);
 }
 
-// 4. No Button Escaping Trick (Fixed logic)
+// 4. No Button Escaping Trick
 function moveNoBtn() {
     const cardRect = proposalScreen.getBoundingClientRect();
     const btnRect = noBtn.getBoundingClientRect();
@@ -135,13 +145,13 @@ function moveNoBtn() {
 noBtn.addEventListener('mouseover', moveNoBtn);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 
-// 5. Yes Button Fix (Guarantee popup opens)
+// 5. Yes Button Fix
 yesBtn.addEventListener('click', () => { 
-    letterModal.style.display = 'flex'; // Explicitly showing the modal
+    letterModal.style.display = 'flex'; 
 });
 
 function closeModal() { 
-    letterModal.style.display = 'none'; // Explicitly hiding the modal
+    letterModal.style.display = 'none'; 
 }
 
 function createNew() { 
