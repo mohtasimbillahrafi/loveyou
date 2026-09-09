@@ -20,12 +20,14 @@
     <!-- Screen 1: Link Generator -->
     <div class="card" id="setupScreen">
         <h2>আপনার চিঠি তৈরি করুন 💌</h2>
-        <p>যাকে প্রপোজ করবেন, তার জন্য সুন্দর করে চিঠি লিখুন:</p>
+        <p>যাকে প্রপোজ করবেন, তার জন্য চিঠি লিখুন ও ব্যাকগ্রাউন্ড মিউজিক দিন:</p>
         
         <textarea id="customLetterInput" placeholder="তোমার জন্য আমার মনের কথা..."></textarea>
         
-        <input type="text" id="ytLinkInput" placeholder="YouTube গানের লিংক (ঐচ্ছিক)">
-        <input type="number" id="ytTimeInput" placeholder="গান কত সেকেন্ড থেকে শুরু হবে? (যেমন: 45)">
+        <input type="text" id="audioLinkInput" placeholder="Direct MP3 Link (ঐচ্ছিক)">
+        <small style="display:block; text-align:left; color:#777; margin:-10px 0 12px 5px; font-size:12px;">
+            *ফাঁকা রাখলে রোমান্টিক ডিফল্ট মিউজিক বাজবে।
+        </small>
         
         <button id="generateBtn" onclick="generateLink()">Link তৈরি করুন 🔗</button>
         
@@ -36,7 +38,7 @@
         </div>
     </div>
 
-    <!-- Screen 1.5: Tap to Open Overlay (For Music) -->
+    <!-- Screen 1.5: Tap to Open Overlay -->
     <div id="startOverlay" style="display: none;">
         <div class="gift-box" id="openSurpriseBtn">
             <div class="gift-icon">🎁</div>
@@ -55,7 +57,7 @@
         </div>
     </div>
 
-    <!-- Animated Letter Modal (Fixed) -->
+    <!-- Animated Letter Modal -->
     <div class="modal" id="letterModal" style="display: none;">
         <div class="letter-envelope">
             <h2 class="letter-title">I Knew It! 🎉❤️</h2>
@@ -70,8 +72,8 @@
         </div>
     </div>
 
-    <!-- Hidden YouTube Player -->
-    <div id="ytPlayerContainer"></div>
+    <!-- Native HTML5 Audio Tag -->
+    <audio id="bgAudio" loop></audio>
 
     <script src="script.js"></script>
 </body>
