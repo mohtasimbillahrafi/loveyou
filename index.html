@@ -20,14 +20,12 @@
     <!-- Screen 1: Link Generator -->
     <div class="card" id="setupScreen">
         <h2>আপনার চিঠি তৈরি করুন 💌</h2>
-        <p>যাকে প্রপোজ করবেন, তার জন্য চিঠি লিখুন ও ব্যাকগ্রাউন্ড মিউজিক দিন:</p>
+        <p>যাকে প্রপোজ করবেন, তার জন্য চিঠি লিখুন:</p>
         
         <textarea id="customLetterInput" placeholder="তোমার জন্য আমার মনের কথা..."></textarea>
         
-        <input type="text" id="audioLinkInput" placeholder="Direct MP3 Link (ঐচ্ছিক)">
-        <small style="display:block; text-align:left; color:#777; margin:-10px 0 12px 5px; font-size:12px;">
-            *ফাঁকা রাখলে রোমান্টিক ডিফল্ট মিউজিক বাজবে।
-        </small>
+        <input type="text" id="ytLinkInput" value="https://youtu.be/8UiAH3tJUTs" placeholder="YouTube গানের লিংক">
+        <input type="number" id="ytTimeInput" value="14" placeholder="গান কত সেকেন্ড থেকে শুরু হবে?">
         
         <button id="generateBtn" onclick="generateLink()">Link তৈরি করুন 🔗</button>
         
@@ -72,9 +70,13 @@
         </div>
     </div>
 
-    <!-- Native HTML5 Audio Tag -->
-    <audio id="bgAudio" loop></audio>
+    <!-- Hidden YouTube Player Container -->
+    <div id="playerWrapper" style="position: fixed; bottom: -200px; left: -200px; opacity: 0.01; pointer-events: none;">
+        <div id="ytPlayer"></div>
+    </div>
 
+    <!-- YouTube IFrame API Script -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
 </body>
 </html>
