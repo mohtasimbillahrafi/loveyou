@@ -30,7 +30,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const shortId = urlParams.get('id');
 
 if (shortId) {
-    setupScreen.style.display = 'none'; // Hide setup screen
+    setupScreen.style.display = 'none'; // Setup স্ক্রিন লুকানো
     
     fetch('https://bytebin.lucko.me/' + shortId)
         .then(res => {
@@ -47,10 +47,26 @@ if (shortId) {
             letterContent.textContent = proposalData.msg;
 
             if (proposalData.yt) {
-                // গান থাকলে Overlay দেখাবে
-                startOverlay.style.display = 'flex';
+                startOverlay.style.display = 'flex'; // গিফট বক্স দেখানো
+                
+                // ম্যাজিক ফিক্স: পেজ লোড হওয়ার সাথেই ভিডিও রেডি করে রাখা হবে (কিন্তু বাজবে না)
+                ytPlayerContainer.innerHTML = ''; 
+                const iframe = document.createElement('iframe');
+                iframe.id = 'ytMusicPlayer';
+                // enablejsapi=1 থাকা বাধ্যতামূলক কমান্ড পাঠানোর জন্য
+                iframe.setAttribute('src', `https://www.youtube.com/embed/${proposalData.yt}?enablejsapi=1&autoplay=0&start=${proposalData.time}&controls=0`);
+                iframe.setAttribute('allow', 'autoplay; encrypted-media');
+                
+                // স্ক্রিন থেকে লুকিয়ে রাখা
+                iframe.style.position = 'absolute';
+                iframe.style.top = '-9999px';
+                iframe.style.left = '-9999px';
+                iframe.style.width = '10px';
+                iframe.style.height = '10px';
+                iframe.style.opacity = '0';
+                
+                ytPlayerContainer.appendChild(iframe);
             } else {
-                // গান না থাকলে সরাসরি প্রপোজাল পেজ
                 proposalScreen.style.display = 'block';
             }
         })
@@ -60,29 +76,15 @@ if (shortId) {
         });
 }
 
-// 2. Play Music reliably on click (The Magic Fix ✨)
+// 2. Play Music on Click (The Final Fix)
 openSurpriseBtn.addEventListener('click', () => {
-    startOverlay.style.display = 'none'; // Hide gift screen
-    proposalScreen.style.display = 'block'; // Show proposal screen
+    startOverlay.style.display = 'none'; 
+    proposalScreen.style.display = 'block'; 
 
-    if (proposalData && proposalData.yt) {
-        ytPlayerContainer.innerHTML = ''; // Clear old data if any
-        
-        const iframe = document.createElement('iframe');
-        // allow="autoplay" টা ঠিকমত দেয়া জরুরি
-        iframe.setAttribute('src', `https://www.youtube.com/embed/${proposalData.yt}?autoplay=1&start=${proposalData.time}&enablejsapi=1&mute=0`);
-        iframe.setAttribute('allow', 'autoplay; encrypted-media');
-        
-        // 브라우জার বাইপাস করার ট্রিক! (display:none এর বদলে এটা)
-        iframe.style.position = 'absolute';
-        iframe.style.top = '-9999px';
-        iframe.style.left = '-9999px';
-        iframe.style.width = '1px';
-        iframe.style.height = '1px';
-        iframe.style.border = 'none';
-        iframe.style.opacity = '0';
-        
-        ytPlayerContainer.appendChild(iframe);
+    const iframe = document.getElementById('ytMusicPlayer');
+    if (iframe && iframe.contentWindow) {
+        // ইউজারের ক্লিকের সাথেই YouTube-কে সিক্রেট কমান্ড পাঠানো হচ্ছে মিউজিক প্লে করার জন্য
+        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
     }
 });
 
@@ -130,9 +132,6 @@ function copyLink() {
 
 // 4. No Button Escaping Trick
 function moveNoBtn() {
-    const cardRect = proposalScreen.getBoundingClientRect();
-    const btnRect = noBtn.getBoundingClientRect();
-    
     const maxX = 150; 
     const maxY = 150;
     
